@@ -1,0 +1,324 @@
+/* =========================
+   Imports
+========================= */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* =========================
+   Theme
+========================= */
+:root{
+--color-primary:102 74 108;
+--color-secondary:184 159 127;
+--color-accent:120 119 198;
+--color-gold:184 150 97;
+
+--color-bg:249 246 241;
+--color-card:255 255 255;
+--color-text:45 45 52;
+--color-muted:108 117 125;
+--color-border:240 237 232;
+
+--shadow-paper:0 4px 20px rgba(0,0,0,.06);
+--shadow-book:0 8px 32px rgba(0,0,0,.08);
+--shadow-vintage:0 20px 40px rgba(0,0,0,.05);
+
+--space-xs:.5rem;
+--space-sm:1rem;
+--space-md:1.5rem;
+--space-lg:2rem;
+--space-xl:3rem;
+--space-2xl:4rem;
+
+--radius-soft:1rem;
+--radius-card:1.5rem;
+--radius-button:50px;
+}
+
+
+/* =========================
+   Reset
+========================= */
+*,
+*::before,
+*::after{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+html,
+body,
+#root{
+width:100%;
+min-height:100%;
+overflow-x:hidden;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+line-height:1.7;
+color:rgb(var(--color-text));
+
+background:
+radial-gradient(circle at 20% 30%, rgba(255,255,255,.65), transparent 45%),
+radial-gradient(circle at 80% 20%, rgba(255,255,255,.55), transparent 40%),
+linear-gradient(
+180deg,
+rgb(249 246 241) 0%,
+rgb(245 243 238) 55%,
+rgb(239 235 230) 100%
+);
+
+background-size:200% 200%;
+animation:paperTexture 30s ease infinite;
+}
+
+@keyframes paperTexture{
+0%,100%{background-position:0% 0%}
+50%{background-position:100% 100%}
+}
+
+/* critical fixed sidebar fix */
+#root{
+overflow:visible !important;
+transform:none !important;
+}
+
+
+/* =========================
+ Typography
+========================= */
+h1,h2,h3,h4,h5{
+font-family:'Fredoka',serif;
+font-weight:600;
+line-height:1.25;
+color:rgb(var(--color-text));
+}
+
+h1{
+font-size:clamp(2.3rem,5vw,4rem);
+}
+
+h2{
+font-size:clamp(1.8rem,4vw,2.5rem);
+color:rgb(var(--color-primary));
+}
+
+p{
+color:rgb(var(--color-muted));
+}
+
+
+/* =========================
+ Cards
+========================= */
+.product-card,
+.category-bubble{
+background:white;
+border:1px solid rgb(var(--color-border));
+border-radius:var(--radius-card);
+box-shadow:var(--shadow-paper);
+transition:.35s;
+position:relative;
+overflow:hidden;
+}
+
+.product-card:hover,
+.category-bubble:hover{
+transform:translateY(-8px);
+box-shadow:var(--shadow-book);
+}
+
+.product-card::before,
+.category-bubble::before{
+content:"";
+position:absolute;
+top:0;
+right:0;
+width:42px;
+height:42px;
+opacity:.2;
+background:
+conic-gradient(
+from 180deg at 50% 0%,
+transparent 0deg,
+rgb(var(--color-border)) 90deg
+);
+}
+
+
+/* =========================
+ Buttons
+========================= */
+.btn-magic{
+background:
+linear-gradient(
+135deg,
+rgb(var(--color-primary)),
+rgb(88 62 94)
+);
+
+color:#fff;
+border:none;
+padding:1rem 2rem;
+border-radius:999px;
+font-weight:600;
+box-shadow:
+0 5px 16px rgba(102,74,108,.3);
+transition:.3s;
+}
+
+.btn-magic:hover{
+transform:translateY(-3px);
+}
+
+.btn-orange{
+background:
+linear-gradient(
+135deg,
+rgb(var(--color-gold)),
+rgb(164 130 87)
+);
+border:none;
+padding:1rem 2rem;
+border-radius:999px;
+}
+
+
+/* =========================
+ Search
+========================= */
+.search-box{
+background:#fff;
+border:2px solid rgb(var(--color-border));
+border-radius:999px;
+padding:1rem 1.5rem;
+box-shadow:var(--shadow-paper);
+}
+
+.search-box:focus{
+outline:none;
+border-color:rgb(var(--color-primary));
+}
+
+
+/* =========================
+ Trust
+========================= */
+.trust-pill{
+background:#fff;
+border:1px solid rgb(var(--color-border));
+padding:1rem 2rem;
+border-radius:999px;
+box-shadow:var(--shadow-paper);
+}
+
+
+/* =========================
+ Scrollbar
+========================= */
+::-webkit-scrollbar{
+width:12px;
+}
+
+::-webkit-scrollbar-track{
+background:rgb(var(--color-bg));
+}
+
+::-webkit-scrollbar-thumb{
+background:
+linear-gradient(
+rgb(var(--color-secondary)),
+rgb(var(--color-gold))
+);
+border-radius:12px;
+}
+
+
+/* =========================
+ Side Drawers FIX
+========================= */
+
+.drawer-overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.38);
+backdrop-filter:blur(2px);
+z-index:9998;
+}
+
+.side-drawer{
+position:fixed !important;
+top:0 !important;
+bottom:0 !important;
+height:100vh !important;
+overflow-y:auto;
+z-index:9999 !important;
+will-change:transform;
+background:#fff;
+}
+
+.side-drawer-left{
+left:0 !important;
+}
+
+.side-drawer-right{
+right:0 !important;
+}
+
+.cart-drawer{
+background:
+linear-gradient(
+180deg,
+white,
+rgb(249 246 241)
+);
+box-shadow:-12px 0 45px rgba(0,0,0,.1);
+}
+
+
+/* =========================
+ Footer protection
+========================= */
+footer{
+position:relative;
+z-index:1;
+}
+
+
+/* =========================
+ Animation
+========================= */
+@keyframes floaty{
+0%,100%{transform:translateY(0)}
+50%{transform:translateY(-6px)}
+}
+
+.floaty{
+animation:floaty 6s ease infinite;
+}
+
+
+/* =========================
+ Responsive
+========================= */
+@media(max-width:768px){
+h1{font-size:2.2rem;}
+h2{font-size:1.7rem;}
+}
+
+@media(prefers-reduced-motion:reduce){
+*{
+animation:none !important;
+transition:.2s !important;
+}
+}
