@@ -2,385 +2,167 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-
-import productsData from "../data/products";
+import { getProductById, getProducts } from "../services/api";
 import { useCart } from "../context/CartContext";
+import { Star, Truck, ShieldCheck, ArrowLeft, Plus, Minus, ShoppingCart } from "lucide-react";
+import ProductCard from "../components/ProductCard";
 
 const Product = () => {
-const { id } = useParams();
-
-const [product,setProduct]=useState(null);
-const [qty,setQty]=useState(1);
-
-const { addToCart } = useCart();
-
-useEffect(()=>{
-const found=productsData.find(
-(p)=>String(p._id)===String(id)
-);
-
-setProduct(found || null);
-
-},[id]);
-
-
-if(!product){
-return(
-<div className="py-32 text-center text-gray-500">
-Product not found
-</div>
-);
-}
-
-
-const addItem=()=>{
-for(let i=0;i<qty;i++){
-addToCart(product);
-}
-toast.success("Added to cart 🛒");
-};
-
-const related=
-productsData
-.filter(p=>p._id!==product._id)
-.slice(0,4);
-
-
-return(
-<div className="bg-slate-50 min-h-screen">
-
-<div className="max-w-7xl mx-auto px-6 py-10">
-
-
-{/* BREADCRUMB */}
-<div className="text-sm text-gray-500 mb-8">
-<Link to="/">Home</Link>
-<span className="mx-2">/</span>
-<span>Toys</span>
-<span className="mx-2">/</span>
-<span className="text-gray-700 font-medium">
-{product.name}
-</span>
-</div>
-
-
-
-<div className="grid lg:grid-cols-2 gap-14 items-start">
-
-
-{/* LEFT GALLERY */}
-<div>
-
-<motion.div
-whileHover={{scale:1.02}}
-className="
-bg-white
-rounded-[36px]
-overflow-hidden
-shadow-lg
-border
-"
->
-
-<img
-src={product.image}
-alt={product.name}
-className="
-w-full
-h-[540px]
-object-cover
-"
-/>
-
-</motion.div>
-
-
-<div className="grid grid-cols-4 gap-4 mt-5">
-{[1,2,3,4].map((i)=>(
-<div
-key={i}
-className="
-rounded-2xl
-overflow-hidden
-border
-bg-white
-shadow-sm
-"
->
-<img
-src={product.image}
-alt=""
-className="h-24 w-full object-cover"
-/>
-</div>
-))}
-</div>
-
-</div>
-
-
-
-{/* RIGHT BUY BOX */}
-<div
-className="
-bg-white
-rounded-[38px]
-shadow-xl
-border
-p-10
-sticky
-top-24
-"
->
-
-<span className="
-inline-block
-bg-indigo-100
-text-indigo-700
-px-4 py-2
-rounded-full
-font-semibold text-sm
-mb-5
-">
-Best Seller
-</span>
-
-
-<h1 className="text-5xl font-black leading-tight">
-{product.name}
-</h1>
-
-
-<div className="flex items-center gap-4 mt-5">
-<div className="text-yellow-500">
-★★★★★
-</div>
-
-<span className="text-gray-500">
-(124 Reviews)
-</span>
-</div>
-
-
-
-<div className="flex items-end gap-4 mt-7">
-<div className="text-4xl font-black text-indigo-600">
-${product.price}
-</div>
-
-<div className="line-through text-gray-400 text-xl">
-${(product.price*1.2).toFixed(0)}
-</div>
-</div>
-
-
-
-<p className="mt-7 text-gray-600 leading-7">
-Premium educational toy made with safe materials,
-designed to boost creativity, problem solving and fun.
-</p>
-
-
-
-<div className="space-y-4 mt-8">
-<div>✔ Child Safe Materials</div>
-<div>✔ STEM Learning Focus</div>
-<div>✔ Fast Shipping</div>
-<div>✔ 30 Day Returns</div>
-</div>
-
-
-
-{/* QTY */}
-<div className="mt-10">
-<p className="font-semibold mb-4">
-Quantity
-</p>
-
-<div className="flex items-center gap-4">
-
-<button
-onClick={()=>setQty(
-Math.max(1,qty-1)
-)}
-className="
-w-11 h-11
-rounded-xl
-border
-"
->
-−
-</button>
-
-<span className="font-bold text-lg">
-{qty}
-</span>
-
-<button
-onClick={()=>setQty(qty+1)}
-className="
-w-11 h-11
-rounded-xl
-border
-"
->
-+
-</button>
-
-</div>
-
-</div>
-
-
-
-<div className="space-y-4 mt-10">
-
-<button
-onClick={addItem}
-className="
-w-full
-bg-indigo-600
-text-white
-py-4
-rounded-2xl
-font-bold
-hover:bg-indigo-700
-transition
-"
->
-Add To Cart
-</button>
-
-
-<button
-className="
-w-full
-bg-slate-900
-text-white
-py-4
-rounded-2xl
-font-bold
-"
->
-Buy Now
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-
-
-{/* DESCRIPTION + REVIEWS */}
-<section className="mt-24">
-
-<div className="grid md:grid-cols-2 gap-12">
-
-<div className="
-bg-white
-rounded-[34px]
-p-10
-shadow
-border
-">
-<h2 className="text-3xl font-bold mb-6">
-Product Details
-</h2>
-
-<p className="text-gray-600 leading-8">
-This toy promotes imagination,
-fine motor skills and problem solving.
-Perfect for home learning and gifting.
-</p>
-
-</div>
-
-
-
-<div className="
-bg-white
-rounded-[34px]
-p-10
-shadow
-border
-">
-
-<h2 className="text-3xl font-bold mb-6">
-Customer Reviews
-</h2>
-
-<div className="space-y-5">
-<p>⭐️⭐️⭐️⭐️⭐️ Amazing quality.</p>
-<p>⭐️⭐️⭐️⭐️ My kid loves it.</p>
-<p>⭐️⭐️⭐️⭐️⭐️ Worth every dollar.</p>
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-
-
-{/* RELATED */}
-<section className="mt-24">
-
-<h2 className="text-4xl font-black mb-10">
-Related Products
-</h2>
-
-<div className="grid md:grid-cols-4 gap-8">
-
-{related.map((p)=>(
-<Link
-to={`/product/${p._id}`}
-key={p._id}
-className="
-bg-white
-rounded-[30px]
-overflow-hidden
-border
-shadow
-hover:-translate-y-1
-transition
-"
->
-
-<img
-src={p.image}
-className="
-h-56
-w-full
-object-cover
-"
-/>
-
-<div className="p-6">
-<h3 className="font-bold">
-{p.name}
-</h3>
-
-<p className="text-indigo-600 font-bold mt-2">
-${p.price}
-</p>
-</div>
-
-</Link>
-))}
-
-</div>
-
-</section>
-
-
-</div>
-</div>
-);
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [qty, setQty] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [related, setRelated] = useState([]);
+  const { addToCart } = useCart();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    (async () => {
+      setLoading(true);
+      const found = await getProductById(id);
+      setProduct(found);
+      
+      if (found) {
+        const allProducts = await getProducts();
+        setRelated(allProducts.filter(p => (p._id || p.id) !== id).slice(0, 4));
+      }
+      setLoading(false);
+    })();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 animate-pulse">
+        <div className="h-8 bg-gray-200 w-1/4 mb-10 rounded"></div>
+        <div className="grid lg:grid-cols-2 gap-14">
+          <div className="h-[540px] bg-gray-200 rounded-[36px]"></div>
+          <div className="space-y-6">
+            <div className="h-12 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-20 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="py-32 text-center">
+        <h2 className="text-2xl font-bold text-gray-800">Product not found</h2>
+        <Link to="/" className="text-indigo-600 hover:underline mt-4 inline-block">Back to Shop</Link>
+      </div>
+    );
+  }
+
+  const addItem = () => {
+    for (let i = 0; i < qty; i++) {
+      addToCart(product);
+    }
+    toast.success(`Added ${qty} items to cart! 🛒`);
+  };
+
+  return (
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        {/* BREADCRUMB */}
+        <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
+          <Link to="/" className="hover:text-indigo-600 transition-colors">Home</Link>
+          <span>/</span>
+          <span className="text-gray-900 font-bold">{product.name}</span>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-14 items-start">
+          {/* LEFT GALLERY */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-[36px] overflow-hidden shadow-2xl border border-gray-100 p-4"
+          >
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-[540px] object-cover rounded-[28px]"
+            />
+          </motion.div>
+
+          {/* RIGHT BUY BOX */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-[38px] shadow-xl border border-gray-50 p-10"
+          >
+            <span className="inline-block bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest mb-4">
+              {product.category || 'Featured'}
+            </span>
+
+            <h1 className="text-4xl font-black leading-tight text-gray-900">
+              {product.name}
+            </h1>
+
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, i) => <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />)}
+              </div>
+              <span className="text-sm text-gray-500 font-medium">(124 Verified Reviews)</span>
+            </div>
+
+            <div className="flex items-center gap-4 mt-8">
+              <div className="text-4xl font-black text-indigo-600">${product.price}</div>
+              <div className="line-through text-gray-300 text-xl font-bold">${(product.price * 1.25).toFixed(0)}</div>
+            </div>
+
+            <p className="mt-8 text-gray-500 leading-relaxed text-sm">
+              Discover the joy of play with our premium {product.name}. 
+              Crafted with high-quality materials to ensure safety and endless hours of creative fun for your little ones.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <div className="flex items-center gap-3 text-xs text-gray-600 bg-gray-50 p-3 rounded-2xl">
+                <ShieldCheck size={20} className="text-emerald-500" />
+                <span>Child Safe Materials</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-gray-600 bg-gray-50 p-3 rounded-2xl">
+                <Truck size={20} className="text-indigo-500" />
+                <span>Fast Global Shipping</span>
+              </div>
+            </div>
+
+            <div className="mt-10 pt-10 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <span className="font-bold text-gray-900">Quantity</span>
+                <div className="flex items-center bg-gray-100 rounded-2xl p-1">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl transition-all"><Minus size={16} /></button>
+                  <span className="w-12 text-center font-black">{qty}</span>
+                  <button onClick={() => setQty(qty + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-xl transition-all"><Plus size={16} /></button>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={addItem}
+                  className="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 transition-all active:scale-95"
+                >
+                  <ShoppingCart size={20} />
+                  Add To Cart
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* RELATED PRODUCTS */}
+        <section className="mt-24">
+          <h2 className="text-3xl font-black mb-10 text-gray-900">You Might Also Like</h2>
+          <div className="grid md:grid-cols-4 gap-8">
+            {related.map((p) => (
+              <ProductCard key={p._id || p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 };
 
 export default Product;
