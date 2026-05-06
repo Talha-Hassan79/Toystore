@@ -1,26 +1,25 @@
 import React, { useState } from 'react';
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Mail, Lock, ArrowRight, ToyBrick } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, ToyBrick } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const Login = () => {
+const Signup = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { signup } = useAuth();
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      await login(email, password);
+      await signup(name, email, password);
       navigate('/');
     } catch (error) {
-      // Error handled in context
+      // Error handling is done in context via toast
     } finally {
       setLoading(false);
     }
@@ -43,11 +42,26 @@ const Login = () => {
             <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200">
               <ToyBrick className="text-white" size={32} />
             </div>
-            <h1 className="text-3xl font-black text-gray-900 mb-2">Member Login</h1>
-            <p className="text-gray-500 text-sm">Join the world of fun and imagination.</p>
+            <h1 className="text-3xl font-black text-gray-900 mb-2">Create Account</h1>
+            <p className="text-gray-500 text-sm">Start your magical journey with us today.</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700 ml-1">Full Name</label>
+              <div className="relative group">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                <input 
+                  type="text" 
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white transition-all text-sm"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-bold text-gray-700 ml-1">Email Address</label>
               <div className="relative group">
@@ -64,10 +78,7 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                <label className="text-sm font-bold text-gray-700">Password</label>
-                <button type="button" className="text-xs text-indigo-600 font-bold hover:underline">Forgot?</button>
-              </div>
+              <label className="text-sm font-bold text-gray-700 ml-1">Password</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
                 <input 
@@ -84,13 +95,13 @@ const Login = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:opacity-50 mt-4"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <>
-                  Sign In
+                  Create Account
                   <ArrowRight size={18} />
                 </>
               )}
@@ -99,7 +110,7 @@ const Login = () => {
 
           <div className="mt-10 pt-8 border-t border-gray-50 text-center">
             <p className="text-sm text-gray-500">
-              Don't have an account? <Link to="/signup" className="text-indigo-600 font-bold hover:underline">Create one</Link>
+              Already have an account? <Link to="/login" className="text-indigo-600 font-bold hover:underline">Sign In</Link>
             </p>
           </div>
         </div>
@@ -108,4 +119,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

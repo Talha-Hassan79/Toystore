@@ -29,16 +29,20 @@ export default function Products() {
   }, [products, searchQuery, selectedCategory]);
 
   return (
-    <section className="max-w-7xl mx-auto px-6 mt-10 min-h-[400px]">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+    <section className="max-w-7xl mx-auto px-6 py-20 min-h-[400px]">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
         <div>
-          <h2 className="text-3xl font-black text-gray-900">
-            {selectedCategory === 'All' ? 'Featured Toys' : `${selectedCategory} Toys`}
+          <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-[0.2em] mb-3">
+             <span className="w-10 h-[2px] bg-indigo-600"></span>
+             Our Collection
+          </div>
+          <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+            {selectedCategory === 'All' ? 'Explore Magic' : `${selectedCategory} Toys`}
           </h2>
-          <p className="text-gray-500 mt-2">
+          <p className="text-slate-500 mt-4 max-w-lg text-lg">
             {searchQuery 
-              ? `Search results for "${searchQuery}"` 
-              : `Browse our hand-picked collection of ${selectedCategory.toLowerCase()} magic.`}
+              ? `Showing results for "${searchQuery}"` 
+              : `Hand-picked premium toys designed to inspire creativity and joy.`}
           </p>
         </div>
         {searchQuery && (

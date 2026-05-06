@@ -18,17 +18,7 @@ const Cart = () => {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 2000)),
-      {
-        loading: 'Processing your payment...',
-        success: <b>Order placed successfully! 🚀</b>,
-        error: <b>Checkout failed.</b>,
-      }
-    ).then(() => {
-      clearCart();
-      navigate('/');
-    });
+    navigate('/checkout');
   };
 
   return (

@@ -10,12 +10,10 @@ export default function Home() {
     <div className="bg-slate-50 min-h-screen">
 
       <Hero />
-      <Stats />
-      <Categories />
-      {/* <AgeSection /> */}
-      <Products />
-      <Trust />
-      <Footer />
+      <div id="stats"><Stats /></div>
+      <div id="categories"><Categories /></div>
+      <div id="products"><Products /></div>
+      <div id="trust"><Trust /></div>
     </div>
   );
 }

@@ -2,55 +2,61 @@ import { motion } from "framer-motion";
 import { useSearch } from "../context/SearchContext";
 
 const categories = [
-  { label: "All", value: "All", emoji: "✨", color: "bg-indigo-50 text-indigo-600" },
-  { label: "Soft Toys", value: "Soft Toys", emoji: "🧸", color: "bg-pink-50 text-pink-600" },
-  { label: "Educational", value: "Educational", emoji: "🧠", color: "bg-emerald-50 text-emerald-600" },
-  { label: "Electronics", value: "Electronics", emoji: "💎", color: "bg-amber-50 text-amber-600" }
+  { label: "All Magic", value: "All", emoji: "✨", color: "from-indigo-400 to-indigo-600" },
+  { label: "Soft Toys", value: "Soft Toys", emoji: "🧸", color: "from-pink-400 to-pink-600" },
+  { label: "Educational", value: "Educational", emoji: "🧠", color: "from-emerald-400 to-emerald-600" },
+  { label: "Electronics", value: "Electronics", emoji: "💎", color: "from-amber-400 to-amber-600" }
 ];
 
 export default function Categories() {
   const { selectedCategory, setSelectedCategory } = useSearch();
 
   return (
-    <section className="max-w-7xl mx-auto px-6 mt-24">
-      <div className="flex justify-between items-end mb-10">
-        <div>
-          <h2 className="text-4xl font-black text-gray-900">
-            Shop by Adventure
-          </h2>
-          <p className="text-gray-500 mt-2">Pick a world to start your journey.</p>
-        </div>
+    <section className="max-w-7xl mx-auto px-6 py-20">
+      <div className="flex flex-col items-center text-center mb-16">
+        <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-4">
+          Explore Your <span className="text-gradient">Adventure</span>
+        </h2>
+        <p className="text-slate-500 max-w-lg">
+          Whether it's a cuddly friend or a brain-teasing puzzle, find the perfect gift for every curious mind.
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
         {categories.map((cat) => (
           <motion.button
             key={cat.value}
-            whileHover={{ y: -5, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setSelectedCategory(cat.value)}
+            whileHover={{ y: -10 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setSelectedCategory(cat.value);
+              document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+            }}
             className={`
-              relative group rounded-[40px] p-8 transition-all duration-300 border-2
+              relative group rounded-[3rem] p-10 transition-all duration-500 overflow-hidden
               ${selectedCategory === cat.value 
-                ? 'bg-white border-indigo-600 shadow-2xl shadow-indigo-100' 
-                : 'bg-white border-transparent shadow-sm hover:shadow-xl hover:border-gray-100'}
+                ? 'bg-slate-900 text-white shadow-2xl shadow-indigo-200' 
+                : 'bg-white text-slate-800 shadow-xl shadow-slate-100 hover:shadow-indigo-100'}
             `}
           >
+            {/* Background Accent */}
+            <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${cat.color} opacity-10 rounded-full -mr-10 -mt-10 group-hover:scale-150 transition-transform duration-700`} />
+            
             <div className={`
-              w-20 h-20 rounded-3xl flex items-center justify-center text-4xl mb-6 mx-auto transition-transform group-hover:scale-110
-              ${cat.color}
+              w-24 h-24 rounded-[2rem] flex items-center justify-center text-5xl mb-8 mx-auto shadow-inner bg-slate-50 transition-transform group-hover:scale-110 group-hover:rotate-6
             `}>
               {cat.emoji}
             </div>
-            <div className="font-black text-lg text-gray-800">{cat.label}</div>
+            <div className="font-black text-xl tracking-tight">{cat.label}</div>
+            <p className={`text-xs mt-2 font-bold uppercase tracking-widest ${selectedCategory === cat.value ? 'text-slate-400' : 'text-indigo-400'}`}>
+              Browse Items
+            </p>
             
             {selectedCategory === cat.value && (
               <motion.div 
-                layoutId="activeCategory"
-                className="absolute -bottom-2 -right-2 bg-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg"
-              >
-                ✓
-              </motion.div>
+                layoutId="activeCategoryDot"
+                className="absolute top-6 left-6 w-3 h-3 bg-pink-500 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.8)]"
+              />
             )}
           </motion.button>
         ))}
