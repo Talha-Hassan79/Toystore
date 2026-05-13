@@ -108,8 +108,8 @@ const Product = () => {
             </div>
 
             <div className="flex items-center gap-4 mt-8">
-              <div className="text-4xl font-black text-indigo-600">${product.price}</div>
-              <div className="line-through text-gray-300 text-xl font-bold">${(product.price * 1.25).toFixed(0)}</div>
+              <div className="text-4xl font-black text-indigo-600">Rs. {product.price}</div>
+              <div className="line-through text-gray-300 text-xl font-bold">Rs. {(product.price * 1.25).toFixed(0)}</div>
             </div>
 
             <p className="mt-8 text-gray-500 leading-relaxed text-sm">

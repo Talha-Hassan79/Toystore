@@ -13,14 +13,20 @@ import {
   ArrowLeft,
   Package
 } from 'lucide-react';
+import { createOrder } from '../services/api';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
   const { cart, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
-  const navigate = useNavigate();
+   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [orderId, setOrderId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' or 'cod'
   const [formData, setFormData] = useState({
+    fullName: user?.name || '',
+    email: user?.email || '',
+    phone: '',
     address: '',
     city: '',
     zip: '',
@@ -35,35 +41,55 @@ const Checkout = () => {
   };
 
   const handleNextStep = () => {
-    if (step === 1 && (!formData.address || !formData.city)) {
-      toast.error('Please fill in shipping details');
-      return;
+    if (step === 1) {
+      const { fullName, email, phone, address, city, zip } = formData;
+      if (!fullName || !email || !phone || !address || !city || !zip) {
+        toast.error('Please fill in ALL shipping and contact details');
+        return;
+      }
+      // Simple email regex
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        toast.error('Please enter a valid email address');
+        return;
+      }
     }
+
+    if (step === 2 && paymentMethod === 'card') {
+      const { cardName, cardNumber, expiry, cvv } = formData;
+      if (!cardName || !cardNumber || !expiry || !cvv) {
+        toast.error('Please fill in ALL card details');
+        return;
+      }
+    }
+    
     setStep(step + 1);
   };
 
   const handlePlaceOrder = () => {
+    const orderData = {
+      customer: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      address: `${formData.address}, ${formData.city}, ${formData.zip}`,
+      total: totalPrice + 5,
+      items: cart.length,
+      paymentMethod: paymentMethod,
+      status: 'Processing'
+    };
+
     toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 2000)),
+      createOrder(orderData),
       {
         loading: 'Processing your order...',
         success: 'Order placed successfully! 🎁',
-        error: 'Payment failed. Please try again.'
+        error: 'Failed to place order. Please try again.'
       }
-    ).then(() => {
-      // Save order to history (mock)
-      const newOrder = {
-        id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        date: new Date().toLocaleDateString(),
-        total: totalPrice,
-        items: cart.length,
-        status: 'Processing'
-      };
-      const existingOrders = JSON.parse(localStorage.getItem('toy_store_orders') || '[]');
-      localStorage.setItem('toy_store_orders', JSON.stringify([newOrder, ...existingOrders]));
-      
-      clearCart();
-      setStep(4);
+    ).then((res) => {
+      if (res) {
+        clearCart();
+        setOrderId(res.id);
+        setStep(4);
+      }
     });
   };
 
@@ -129,16 +155,22 @@ const Checkout = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Full Name</label>
-                        <input type="text" defaultValue={user?.name} className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="John Doe" />
+                        <input name="fullName" value={formData.fullName} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="John Doe" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Email</label>
-                        <input type="email" defaultValue={user?.email} className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="john@example.com" />
+                        <input name="email" value={formData.email} onChange={handleInputChange} type="email" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="john@example.com" />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Address</label>
-                      <input name="address" value={formData.address} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="123 Magic Lane" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Phone Number</label>
+                        <input name="phone" value={formData.phone} onChange={handleInputChange} type="tel" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="+1 (555) 000-0000" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Address</label>
+                        <input name="address" value={formData.address} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="123 Magic Lane" />
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
@@ -174,32 +206,75 @@ const Checkout = () => {
                   <h2 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
                     <CreditCard className="text-indigo-600" /> Payment Method
                   </h2>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Cardholder Name</label>
-                      <input name="cardName" value={formData.cardName} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="JOHN DOE" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Card Number</label>
-                      <input name="cardNumber" value={formData.cardNumber} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="0000 0000 0000 0000" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Expiry Date</label>
-                        <input name="expiry" value={formData.expiry} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="MM/YY" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">CVV</label>
-                        <input name="cvv" value={formData.cvv} onChange={handleInputChange} type="password" placeholder="***" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" />
-                      </div>
-                    </div>
+
+                  <div className="flex bg-slate-50 p-2 rounded-2xl gap-2 mb-8">
                     <button 
-                      onClick={handleNextStep}
-                      className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                      onClick={() => setPaymentMethod('card')}
+                      className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${paymentMethod === 'card' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400'}`}
                     >
-                      Review Order <ChevronRight size={18} />
+                      Credit Card
+                    </button>
+                    <button 
+                      onClick={() => setPaymentMethod('cod')}
+                      className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${paymentMethod === 'cod' ? 'bg-white shadow-sm text-indigo-600' : 'text-gray-400'}`}
+                    >
+                      Cash on Delivery
                     </button>
                   </div>
+
+                  <AnimatePresence mode="wait">
+                    {paymentMethod === 'card' ? (
+                      <motion.div 
+                        key="card"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="space-y-6"
+                      >
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Cardholder Name</label>
+                          <input name="cardName" value={formData.cardName} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="JOHN DOE" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Card Number</label>
+                          <input name="cardNumber" value={formData.cardNumber} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="0000 0000 0000 0000" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Expiry Date</label>
+                            <input name="expiry" value={formData.expiry} onChange={handleInputChange} type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" placeholder="MM/YY" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">CVV</label>
+                            <input name="cvv" value={formData.cvv} onChange={handleInputChange} type="password" placeholder="***" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/20" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <motion.div 
+                        key="cod"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="p-8 bg-indigo-50 rounded-[32px] border border-indigo-100 text-center"
+                      >
+                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-indigo-600">
+                           <Package size={32} />
+                        </div>
+                        <h4 className="font-bold text-indigo-900 mb-2">Cash on Delivery</h4>
+                        <p className="text-sm text-indigo-600/70">
+                          You'll pay for your order when it's delivered to your doorstep. Please have the exact amount ready!
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <button 
+                    onClick={handleNextStep}
+                    className="w-full mt-8 bg-indigo-600 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                  >
+                    Review Order <ChevronRight size={18} />
+                  </button>
                 </motion.div>
               )}
 
@@ -218,22 +293,41 @@ const Checkout = () => {
                     <ShieldCheck className="text-indigo-600" /> Review Your Order
                   </h2>
                   <div className="space-y-8">
-                    <div className="p-6 bg-slate-50 rounded-3xl grid grid-cols-2 gap-8">
-                      <div>
-                        <h4 className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-2">Ship To</h4>
-                        <p className="text-sm font-bold text-gray-800">{user?.name || 'Guest'}</p>
-                        <p className="text-xs text-gray-500">{formData.address}, {formData.city}</p>
+                    <div className="p-6 bg-slate-50 rounded-3xl space-y-4">
+                      <div className="grid grid-cols-2 gap-8 pb-4 border-b border-slate-200">
+                        <div>
+                          <h4 className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-2">Ship To</h4>
+                          <p className="text-sm font-bold text-gray-800">{formData.fullName}</p>
+                          <p className="text-xs text-gray-500">{formData.address}</p>
+                          <p className="text-xs text-gray-500">{formData.city}, {formData.zip}</p>
+                        </div>
+                        <div>
+                          <h4 className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-2">Contact</h4>
+                          <p className="text-xs text-gray-500">{formData.email}</p>
+                          <p className="text-xs text-gray-500">{formData.phone}</p>
+                        </div>
                       </div>
                       <div>
-                        <h4 className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-2">Payment</h4>
-                        <p className="text-sm font-bold text-gray-800">Ending in {formData.cardNumber.slice(-4) || 'XXXX'}</p>
-                        <p className="text-xs text-gray-500">Exp: {formData.expiry}</p>
+                        <h4 className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-2">Payment Method</h4>
+                        <div className="flex items-center gap-2 text-sm font-bold text-gray-800">
+                          {paymentMethod === 'card' ? (
+                            <>
+                              <CreditCard size={16} className="text-indigo-600" />
+                              Card ending in {formData.cardNumber.slice(-4) || 'XXXX'}
+                            </>
+                          ) : (
+                            <>
+                              <Package size={16} className="text-indigo-600" />
+                              Cash on Delivery
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                     
                     <div className="space-y-4">
                       {cart.map((item) => (
-                        <div key={item._id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                        <div key={item._id || item.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                           <div className="flex items-center gap-4">
                             <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
                             <div>
@@ -241,7 +335,7 @@ const Checkout = () => {
                               <p className="text-xs text-gray-400">Qty: {item.qty}</p>
                             </div>
                           </div>
-                          <p className="text-sm font-black text-indigo-600">${(item.price * item.qty).toFixed(2)}</p>
+                          <p className="text-sm font-black text-indigo-600">Rs. {(item.price * item.qty).toFixed(2)}</p>
                         </div>
                       ))}
                     </div>
@@ -250,7 +344,7 @@ const Checkout = () => {
                       onClick={handlePlaceOrder}
                       className="w-full bg-emerald-500 text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100"
                     >
-                      Confirm & Pay ${(totalPrice + 5).toFixed(2)}
+                      {paymentMethod === 'card' ? `Pay Rs. ${(totalPrice + 5).toFixed(2)}` : 'Confirm Order'}
                     </button>
                   </div>
                 </motion.div>
@@ -267,21 +361,27 @@ const Checkout = () => {
                     <CheckCircle size={56} />
                   </div>
                   <h2 className="text-3xl font-black text-gray-900 mb-4">Magic in Progress!</h2>
-                  <p className="text-gray-500 mb-10 max-w-sm mx-auto">
+                  <p className="text-gray-500 mb-6 max-w-sm mx-auto">
                     Your toys are being packed with care and will be flying to you shortly.
                   </p>
+                  
+                  <div className="bg-indigo-50 p-6 rounded-3xl mb-10 inline-block px-10 border border-indigo-100">
+                    <p className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Your Order ID</p>
+                    <p className="text-2xl font-black text-indigo-600">{orderId}</p>
+                  </div>
+
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button 
                       onClick={() => navigate('/')}
-                      className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-black transition-all"
+                      className="bg-gray-100 text-gray-600 px-8 py-4 rounded-2xl font-bold hover:bg-gray-200 transition-all"
                     >
-                      Back to Home
+                      Continue Shopping
                     </button>
                     <button 
-                      onClick={() => navigate('/orders')}
-                      className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all"
+                      onClick={() => navigate('/track-order')}
+                      className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
                     >
-                      View My Orders
+                      Track Order
                     </button>
                   </div>
                 </motion.div>
@@ -296,20 +396,20 @@ const Checkout = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>Subtotal</span>
-                  <span className="font-bold text-gray-900">${totalPrice.toFixed(2)}</span>
+                  <span className="font-bold text-gray-900">Rs. {totalPrice.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>Shipping</span>
-                  <span className="font-bold text-gray-900">$5.00</span>
+                  <span className="font-bold text-gray-900">Rs. 5.00</span>
                 </div>
                 <div className="flex justify-between text-sm text-gray-500">
                   <span>Tax</span>
-                  <span className="font-bold text-gray-900">$0.00</span>
+                  <span className="font-bold text-gray-900">Rs. 0.00</span>
                 </div>
               </div>
               <div className="pt-6 border-t border-gray-100 flex justify-between items-center">
                 <span className="text-sm font-black text-gray-400 uppercase tracking-widest">Total</span>
-                <span className="text-3xl font-black text-indigo-600">${(totalPrice + 5).toFixed(2)}</span>
+                <span className="text-3xl font-black text-indigo-600">Rs. {(totalPrice + 5).toFixed(2)}</span>
               </div>
             </div>
           )}

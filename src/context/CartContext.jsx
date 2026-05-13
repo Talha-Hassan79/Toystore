@@ -17,14 +17,15 @@ export const CartProvider = ({ children }) => {
 
   // ADD
   const addToCart = (product) => {
-    if (!product?._id) return;
+    const productId = product?._id || product?.id;
+    if (!productId) return;
 
     setCart((prev) => {
-      const exists = prev.find((p) => p._id === product._id);
+      const exists = prev.find((p) => (p._id || p.id) === productId);
 
       if (exists) {
         return prev.map((p) =>
-          p._id === product._id
+          (p._id || p.id) === productId
             ? { ...p, qty: (p.qty || 1) + 1 }
             : p
         );
@@ -38,7 +39,7 @@ export const CartProvider = ({ children }) => {
   const increaseQty = (id) => {
     setCart((prev) =>
       prev.map((p) =>
-        p._id === id ? { ...p, qty: (p.qty || 1) + 1 } : p
+        (p._id || p.id) === id ? { ...p, qty: (p.qty || 1) + 1 } : p
       )
     );
   };
@@ -48,7 +49,7 @@ export const CartProvider = ({ children }) => {
     setCart((prev) =>
       prev
         .map((p) =>
-          p._id === id ? { ...p, qty: (p.qty || 1) - 1 } : p
+          (p._id || p.id) === id ? { ...p, qty: (p.qty || 1) - 1 } : p
         )
         .filter((p) => (p.qty || 0) > 0)
     );
@@ -56,7 +57,7 @@ export const CartProvider = ({ children }) => {
 
   // REMOVE COMPLETELY (even 1 item)
   const removeItem = (id) => {
-    setCart((prev) => prev.filter((p) => p._id !== id));
+    setCart((prev) => prev.filter((p) => (p._id || p.id) !== id));
   };
 
   const clearCart = () => setCart([]);

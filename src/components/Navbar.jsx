@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Search, X, ShoppingCart, User, LogOut, Package, Sparkles } from "lucide-react";
 import { useSearch } from "../context/SearchContext";
@@ -10,6 +10,28 @@ const Navbar = () => {
   const { searchQuery, setSearchQuery } = useSearch();
   const { cart } = useCart();
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    // If user starts searching from a different page, take them to the shop home
+    if (value && location.pathname !== '/') {
+      navigate('/');
+    }
+
+    // Auto-scroll to products section so results are visible immediately
+    if (value) {
+      setTimeout(() => {
+        const element = document.getElementById('products');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  };
 
   return (
     <div className="fixed top-6 left-0 w-full z-50 px-6">
@@ -35,7 +57,7 @@ const Navbar = () => {
                 type="text" 
                 placeholder="Find magic toys..." 
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full bg-slate-100/50 border border-transparent rounded-2xl py-3 pl-12 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:bg-white transition-all"
               />
               {searchQuery && (

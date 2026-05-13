@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import Home from "./pages/Home.jsx";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
@@ -10,6 +10,7 @@ import Shipping from "./pages/Shipping";
 import Returns from "./pages/Returns";
 import Contact from "./pages/Contact";
 import AdminLogin from "./pages/AdminLogin";
+import TrackOrder from "./pages/TrackOrder";
 import Layout from "./layout/Layout";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/returns" element={<Returns />} />
           <Route path="/contact" element={<Contact />} />
+           <Route path="/track-order" element={<TrackOrder />} />
           <Route path="/admin-login" element={<AdminLogin />} />
         </Routes>
       </Layout>

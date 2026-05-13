@@ -1,7 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API = "http://localhost:3000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const getProducts = async () => {
   try {
@@ -21,6 +21,26 @@ export const getProductById = async (id) => {
   } catch (error) {
     console.error(`Error fetching product ${id}:`, error);
     toast.error("Product details could not be loaded.");
+  }
+};
+
+export const createOrder = async (orderData) => {
+  try {
+    const res = await axios.post(`${API}/orders`, orderData);
+    return res.data;
+  } catch (error) {
+    console.error("Error creating order:", error);
+    toast.error("Failed to place order.");
+    return null;
+  }
+};
+
+export const trackOrder = async (id) => {
+  try {
+    const res = await axios.get(`${API}/orders/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error tracking order:", error);
     return null;
   }
 };

@@ -35,7 +35,8 @@ const Layout = ({ children }) => {
             <h4 className="font-bold text-slate-900 mb-4">Help</h4>
             <ul className="space-y-2 text-sm text-slate-500">
               <li><Link to="/shipping" className="hover:text-indigo-600 transition-colors">Shipping Info</Link></li>
-               <li><Link to="/returns" className="hover:text-indigo-600 transition-colors">Returns</Link></li>
+              <li><Link to="/returns" className="hover:text-indigo-600 transition-colors">Returns</Link></li>
+              <li><Link to="/track-order" className="hover:text-indigo-600 transition-colors">Track Order</Link></li>
               <li><Link to="/contact" className="hover:text-indigo-600 transition-colors">Contact Us</Link></li>
             </ul>
           </div>
