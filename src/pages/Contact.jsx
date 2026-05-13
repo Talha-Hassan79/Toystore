@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -6,14 +7,28 @@ import toast from 'react-hot-toast';
 const Contact = () => {
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+    
+    const formData = new FormData(e.target);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      content: formData.get('message')
+    };
+
+    try {
+      await axios.post(`${API}/messages`, data);
       toast.success("Message sent! We'll get back to you soon. ✨");
-      setLoading(false);
       e.target.reset();
-    }, 1500);
+    } catch (error) {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -80,17 +95,17 @@ const Contact = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-2">Your Name</label>
-                  <input required type="text" className="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/10 transition-all" placeholder="John Doe" />
+                  <input required name="name" type="text" className="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/10 transition-all" placeholder="John Doe" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-2">Email Address</label>
-                  <input required type="email" className="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/10 transition-all" placeholder="john@example.com" />
+                  <input required name="email" type="email" className="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/10 transition-all" placeholder="john@example.com" />
                 </div>
               </div>
               
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-2">Message</label>
-                <textarea required rows="4" className="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none" placeholder="How can we help?"></textarea>
+                <textarea required name="message" rows="4" className="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-indigo-500/10 transition-all resize-none" placeholder="How can we help?"></textarea>
               </div>
 
               <button 

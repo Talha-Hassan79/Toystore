@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home.jsx";
+import Home from "./pages/Home";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
@@ -28,7 +28,7 @@ function App() {
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/returns" element={<Returns />} />
           <Route path="/contact" element={<Contact />} />
-           <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/track-order" element={<TrackOrder />} />
           <Route path="/admin-login" element={<AdminLogin />} />
         </Routes>
       </Layout>

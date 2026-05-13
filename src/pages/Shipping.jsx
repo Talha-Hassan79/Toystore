@@ -6,7 +6,7 @@ const Shipping = () => {
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-[3rem] p-12 md:p-16 shadow-2xl shadow-indigo-100/50"
@@ -14,7 +14,7 @@ const Shipping = () => {
           <div className="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mb-8">
             <Truck size={40} />
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">Shipping Information</h1>
           <p className="text-lg text-slate-500 mb-12 leading-relaxed">
             We deliver magic right to your doorstep. Here is everything you need to know about our shipping process and delivery times.
@@ -30,7 +30,7 @@ const Shipping = () => {
                 We ship to over 50 countries worldwide. No matter where you are, we'll find a way to bring the joy of ToyStore to your family.
               </p>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-indigo-600 font-bold">
                 <Clock size={20} />
@@ -72,12 +72,12 @@ const Shipping = () => {
                   <tr>
                     <td className="px-6 py-4 font-bold">Express Delivery</td>
                     <td className="px-6 py-4">2-3 Business Days</td>
-                    <td className="px-6 py-4">$15.00</td>
+                    <td className="px-6 py-4">Rs 350.00</td>
                   </tr>
                   <tr>
                     <td className="px-6 py-4 font-bold">Magical Overnight</td>
                     <td className="px-6 py-4">Next Day</td>
-                    <td className="px-6 py-4">$29.00</td>
+                    <td className="px-6 py-4">Rs 500.00</td>
                   </tr>
                 </tbody>
               </table>

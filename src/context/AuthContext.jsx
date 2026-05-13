@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -18,42 +19,41 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  const API = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
   const login = async (email, password) => {
-    // Simulated API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const userData = { 
-          id: 'u1', 
-          name: email.split('@')[0], 
-          email, 
-          role: 'user',
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-        };
-        setUser(userData);
-        localStorage.setItem('toy_store_user', JSON.stringify(userData));
-        toast.success(`Welcome back, ${userData.name}! 🧸`);
-        resolve(userData);
-      }, 1000);
-    });
+    try {
+      const res = await axios.post(`${API}/auth/login`, { email, password });
+      const { access_token, user: userData } = res.data;
+      
+      const fullUserData = {
+        ...userData,
+        token: access_token,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
+      };
+
+      setUser(fullUserData);
+      localStorage.setItem('toy_store_user', JSON.stringify(fullUserData));
+      toast.success(`Welcome back, ${userData.name}! 🧸`);
+      return fullUserData;
+    } catch (error) {
+      const message = error.response?.data?.message || "Login failed";
+      toast.error(Array.isArray(message) ? message[0] : message);
+      throw error;
+    }
   };
 
   const signup = async (name, email, password) => {
-    // Simulated API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const userData = { 
-          id: Date.now().toString(), 
-          name, 
-          email, 
-          role: 'user',
-          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-        };
-        setUser(userData);
-        localStorage.setItem('toy_store_user', JSON.stringify(userData));
-        toast.success(`Welcome to ToyStore, ${name}! 🚀`);
-        resolve(userData);
-      }, 1200);
-    });
+    try {
+      const res = await axios.post(`${API}/auth/signup`, { name, email, password });
+      // NestJS auth service returns the user object on signup (without token)
+      // So we automatically log them in after signup
+      return login(email, password);
+    } catch (error) {
+      const message = error.response?.data?.message || "Signup failed";
+      toast.error(Array.isArray(message) ? message[0] : message);
+      throw error;
+    }
   };
 
   const logout = () => {

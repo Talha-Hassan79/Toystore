@@ -73,6 +73,7 @@ const Checkout = () => {
       address: `${formData.address}, ${formData.city}, ${formData.zip}`,
       total: totalPrice + 5,
       items: cart.length,
+      itemsList: cart,
       paymentMethod: paymentMethod,
       status: 'Processing'
     };
