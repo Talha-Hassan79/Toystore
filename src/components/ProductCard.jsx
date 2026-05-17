@@ -9,6 +9,7 @@ const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [currentImgIdx, setCurrentImgIdx] = useState(0);
 
   if (!product) return null;
 
@@ -45,20 +46,43 @@ const ProductCard = ({ product }) => {
       </button>
 
       {/* IMAGE CONTAINER */}
-      <Link to={`/product/${productId}`} className="block relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-slate-50 mb-6">
-        <img
-          src={product.image || "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?auto=format&fit=crop&q=80&w=400"}
-          alt={product.name}
-          className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
-        />
-        
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-           <div className="bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-xl">
-             <Eye size={24} className="text-slate-900" />
-           </div>
-        </div>
-      </Link>
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-slate-50 mb-6 group/img">
+        <Link to={`/product/${productId}`} className="block w-full h-full">
+          <img
+            src={product.images && product.images.length > 0 ? product.images[currentImgIdx] : (product.image || "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?auto=format&fit=crop&q=80&w=400")}
+            alt={product.name}
+            className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700"
+          />
+          
+          {/* Hover Overlay */}
+          <div className="absolute inset-0 bg-indigo-900/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 pointer-events-none">
+             <div className="bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-xl">
+               <Eye size={24} className="text-slate-900" />
+             </div>
+          </div>
+        </Link>
+
+        {/* Carousel Dots */}
+        {product.images && product.images.length > 1 && (
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-1.5 z-20">
+            {product.images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setCurrentImgIdx(idx);
+                }}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  currentImgIdx === idx 
+                    ? "bg-indigo-600 w-4" 
+                    : "bg-white/60 hover:bg-white"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* INFO */}
       <div className="px-2 pb-2">

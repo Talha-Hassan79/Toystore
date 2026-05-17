@@ -66,7 +66,7 @@ const Cart = () => {
                     className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 flex items-center gap-6 group hover:shadow-md transition-shadow"
                   >
                     <div className="w-24 h-24 bg-gray-50 rounded-2xl overflow-hidden shrink-0 border border-gray-100">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={item.images && item.images.length > 0 ? item.images[0] : item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
 
                     <div className="flex-1">

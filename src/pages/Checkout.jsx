@@ -330,7 +330,7 @@ const Checkout = () => {
                       {cart.map((item) => (
                         <div key={item._id || item.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                           <div className="flex items-center gap-4">
-                            <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
+                            <img src={item.images && item.images.length > 0 ? item.images[0] : item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
                             <div>
                               <p className="text-sm font-bold text-gray-800">{item.name}</p>
                               <p className="text-xs text-gray-400">Qty: {item.qty}</p>

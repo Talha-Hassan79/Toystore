@@ -11,6 +11,7 @@ const Product = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [qty, setQty] = useState(1);
+  const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [related, setRelated] = useState([]);
   const { addToCart } = useCart();
@@ -77,13 +78,30 @@ const Product = () => {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-[36px] overflow-hidden shadow-2xl border border-gray-100 p-4"
+            className="flex flex-col gap-4"
           >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-[540px] object-cover rounded-[28px]"
-            />
+            <div className="bg-white rounded-[36px] overflow-hidden shadow-2xl border border-gray-100 p-4">
+              <img
+                src={product.images && product.images.length > 0 ? product.images[activeImage] : product.image}
+                alt={product.name}
+                className="w-full h-[540px] object-cover rounded-[28px] transition-all duration-500"
+              />
+            </div>
+            
+            {/* THUMBNAILS */}
+            {product.images && product.images.length > 1 && (
+              <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+                {product.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImage(idx)}
+                    className={`shrink-0 w-24 h-24 rounded-2xl overflow-hidden border-4 transition-all duration-300 ${activeImage === idx ? 'border-indigo-600 shadow-lg scale-105' : 'border-transparent hover:border-indigo-300'}`}
+                  >
+                    <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* RIGHT BUY BOX */}
