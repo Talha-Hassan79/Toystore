@@ -1,15 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Package, Clock, CheckCircle, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Package, Clock, CheckCircle, ChevronRight, ShoppingBag, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { getOrdersByEmail } from '../services/api';
 
 const Orders = () => {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedOrders = JSON.parse(localStorage.getItem('toy_store_orders') || '[]');
-    setOrders(savedOrders);
-  }, []);
+    const fetchOrders = async () => {
+      setLoading(true);
+      if (user && user.email) {
+        const data = await getOrdersByEmail(user.email);
+        setOrders(data || []);
+      } else {
+        const savedOrders = JSON.parse(localStorage.getItem('toy_store_orders') || '[]');
+        setOrders(savedOrders);
+      }
+      setLoading(false);
+    };
+    fetchOrders();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20 px-6">
@@ -24,7 +38,12 @@ const Orders = () => {
           </Link>
         </div>
 
-        {orders.length === 0 ? (
+        {loading ? (
+          <div className="bg-white rounded-[40px] p-20 text-center shadow-xl shadow-indigo-100/50 flex flex-col items-center justify-center">
+            <Loader2 className="animate-spin text-indigo-600 mb-4" size={40} />
+            <h2 className="text-xl font-bold text-gray-800">Loading your orders...</h2>
+          </div>
+        ) : orders.length === 0 ? (
           <div className="bg-white rounded-[40px] p-20 text-center shadow-xl shadow-indigo-100/50">
             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <Package size={40} className="text-gray-300" />

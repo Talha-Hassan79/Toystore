@@ -44,3 +44,13 @@ export const trackOrder = async (id) => {
     return null;
   }
 };
+
+export const getOrdersByEmail = async (email) => {
+  try {
+    const res = await axios.get(`${API}/orders`, { params: { email } });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching orders by email:", error);
+    return [];
+  }
+};
